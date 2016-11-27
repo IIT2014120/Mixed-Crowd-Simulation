@@ -2,6 +2,7 @@ import os
 import pickle
 import math as m
 import random
+import winsound
 import time
 from visual import *
 # from collections import namedtuple
@@ -20,18 +21,6 @@ import sim3.passengerIn1 as passengerIn1
 import sim3.passengerIn2 as passengerIn2
 import sim3.passengerOut1 as passengerOut1
 import sim3.passengerOut2 as passengerOut2
-
-# Exam Cell - 0,0,25
-# Pillar1 - 0,50,5
-# Pillar2 - 0,50,5
-# Reception - -50,75,5
-# Account(Stu) - -65,30,10
-# Account(Pri) - -65,-30,10
-# Director - -50,-75,5
-# COW - 50,75,5
-# Dean(Aca) - 0,-75,10
-# Dean(SA) - 70,0,15
-# Bank - 50,-50,10
 
 p = 0.3
 v0 = 1.5
@@ -295,6 +284,10 @@ def getData1 (na, isdisplay=0, readFromFile="y"):
     # print noOfAgent
 
     markDel = []
+    avgdistance = 0
+    avgspeed = 0
+    avgtime = 0
+
     while len(users)-len(markDel) > 0 :
         # print len(markDel)
         if isdisplay == 1:
@@ -327,18 +320,36 @@ def getData1 (na, isdisplay=0, readFromFile="y"):
                     users[x][2] = users[x][3]
                     users[x][3] = nextDest
             # print "users[x][3] = ", users[x][3], "Over"
-            socialForce = fagent(users[x], users) + fbuilding(users[x], building) + ftarget(users[x], users, position[users[x][3]][0], position[users[x][3]][1])
-            users[x][1].velocity = users[x][1].velocity + socialForce*dt
-            if (mag (users[x][1].velocity) > v0):
-                users[x][1].velocity = v0 * norm(users[x][1].velocity)
-            users[x][1].pos = users[x][1].pos + users[x][1].velocity*dt
-            # check(i, na)
+            else:
+                socialForce = fagent(users[x], users) + fbuilding(users[x], building) + ftarget(users[x], users, position[users[x][3]][0], position[users[x][3]][1])
+                users[x][1].velocity = users[x][1].velocity + socialForce*dt
+                if (mag (users[x][1].velocity) > v0):
+                    users[x][1].velocity = v0 * norm(users[x][1].velocity)
+                users[x][1].pos = users[x][1].pos + users[x][1].velocity*dt
+                
+                # Required Values for Conclusions
+                avgdistance = avgdistance + mag(users[x][1].velocity*dt)
+                # avgspeed = avgspeed + mag(users[x][1].velocity)
+                avgtime = avgtime + dt
 
+        markDelCtr = 0
         for i in markDel:
-            del users[i]
+            try:
+                del users[i-markDelCtr]
+                markDelCtr = markDelCtr + 1
+            except :
+                print markDel
+                print users
+                print i, markDelCtr, len(users)
+                winsound.Beep(300,2000)
+                raise
         markDel = []
     # print "Done!!!"
-    return time.time() - start_time
+    
+    avgspeed = avgdistance/avgtime
+    avgdistance = avgdistance/na
+    avgtime = avgtime/na
+    return (time.time() - start_time, avgdistance, avgspeed, avgtime)
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
 
@@ -425,6 +436,10 @@ def getData2(na, isdisplay=0, readFromFile="y"):
     # print noOfAgent
 
     markDel = []
+    avgdistance = 0
+    avgspeed = 0
+    avgtime = 0
+
     while len(users) - len(markDel) > 0:
         # print len(markDel)
         if isdisplay == 1:
@@ -457,20 +472,34 @@ def getData2(na, isdisplay=0, readFromFile="y"):
                     users[x][2] = users[x][3]
                     users[x][3] = nextDest
             # print "users[x][3] = ", users[x][3], "Over"
-            socialForce = fagent(users[x], users) + fbuilding(users[x], building) + ftarget(users[x], users,
-                                                                                            position[users[x][3]][0],
-                                                                                            position[users[x][3]][1])
-            users[x][1].velocity = users[x][1].velocity + socialForce * dt
-            if (mag(users[x][1].velocity) > v0):
-                users[x][1].velocity = v0 * norm(users[x][1].velocity)
-            users[x][1].pos = users[x][1].pos + users[x][1].velocity * dt
-            # check(i, na)
+            else:
 
+                socialForce = fagent(users[x], users) + fbuilding(users[x], building) + ftarget(users[x], users, position[users[x][3]][0], position[users[x][3]][1])
+                users[x][1].velocity = users[x][1].velocity + socialForce * dt
+                if (mag(users[x][1].velocity) > v0):
+                    users[x][1].velocity = v0 * norm(users[x][1].velocity)
+                users[x][1].pos = users[x][1].pos + users[x][1].velocity * dt
+                # Required Values for Conclusions
+                avgdistance = avgdistance + mag(users[x][1].velocity*dt)
+                # avgspeed = avgspeed + mag(users[x][1].velocity)
+                avgtime = avgtime + dt
+
+        markDelCtr = 0
         for i in markDel:
-            del users[i]
+            try:
+                del users[i-markDelCtr]
+                markDelCtr = markDelCtr + 1
+            except :
+                print markDel
+                print users
+                print i, markDelCtr, len(users)
+                winsound.Beep(300,2000)
+                raise
         markDel = []
-    # print "Done!!!"
-    return time.time() - start_time
+    avgspeed = avgdistance/avgtime
+    avgdistance = avgdistance/na
+    avgtime = avgtime/na
+    return (time.time() - start_time, avgdistance, avgspeed, avgtime)
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
 def getData3(na, isdisplay=0, readFromFile="y"):
@@ -604,11 +633,14 @@ def getData3(na, isdisplay=0, readFromFile="y"):
     return time.time() - start_time
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
-getData3(10, 1)
+# print getData1(10, 
 
-# simTime = pickle.load(open("simtime1.dat", "rb"))
-# print simTime
-# for i in range(27,80):
-#     simTime[i] = getData1(i)
-#     print i, simTime[i]
-#     pickle.dump(simTime, open("simtime1.dat", "wb"))
+curScene = 1
+possibleScenes = [0, getData1, getData2, getData3]
+
+simTime = {}
+# # 
+for i in range(0,80):
+    simTime[i] = possibleScenes[curScene](i)
+    print i, simTime[i]
+    pickle.dump(simTime, open("simTime1.dat", "wb"))
