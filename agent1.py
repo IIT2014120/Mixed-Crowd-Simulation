@@ -8,10 +8,13 @@ from visual import *
 import project3 as helper
 
 # FSM imports
-import oldStudent
-import newStudent
-import faculty
-import staff
+import sim1.oldStudent as oldStudent
+import sim1.newStudent as newStudent
+import sim1.faculty as faculty
+import sim1.staff as staff
+
+import sim2.externalStudent as externalStudent
+import sim2.internalStudent as internalStudent
 
 # Exam Cell - 0,0,25
 # Pillar1 - 0,50,5
@@ -186,6 +189,8 @@ def ftarget(curAgent, users, gx, gy):
     return v
 
 def getData1 (na, isdisplay=0, readFromFile="y"):
+    global rd
+    rd = 2
     gridSize = 200
     office = {'Director': (50, 25, 5), 'Dean-Affairs': (170, 100, 15), 'COW': (150, 175, 5), 'Exam-Cell': (100, 100, 25), 'Dean-Academics': (100,
     25, 10), 'Accounts-Priority': (35, 70, 10), 'Accounts-Student': (35, 130, 10), 'Reception': (50, 175, 5),
@@ -312,9 +317,11 @@ def getData1 (na, isdisplay=0, readFromFile="y"):
 
 
 def getData2(na, isdisplay=0, readFromFile="y"):
+    global rd
+    rd = 4
     gridSize = 600
     office = {'Admin': (200, 150, 100), 'CC3': (100, 450, 50), 'Ground': (400, 300, 125),
-              'HQ': (550, 100, 20), 'Cafeteria': (500, 50, 25)}
+              'HQ': (550, 100, 20), 'Cafeteria': (500, 450, 25)}
 
     doors = {'Main-Gate': (150, 0, 0), 'Pocket-Gate': (400, 0, 0)}
 
@@ -362,13 +369,17 @@ def getData2(na, isdisplay=0, readFromFile="y"):
     users = []
     noOfAgent = [0, 0, 0, 0]
     if isdisplay == 1:
-        createGrid1()
+        CreateGrid2()
     start_time = time.time()
     for i in range(0, na):
         x = random.randint(0, 2)
         # print x, agentType[x]
         noOfAgent[x] = noOfAgent[x] + 1
-        location = x
+        location = ''
+        if x == 0:
+            location = 'Main-Gate'
+        else:
+            location = 'Pocket-Gate'
         users.append([])
         users[i].append(agentType[x].FSM())
         users[i].append(sphere(pos=doors[location], radius=rd, color=agentColor[x], velocity=vector(0, 0, 0), visible=False))
@@ -397,7 +408,7 @@ def getData2(na, isdisplay=0, readFromFile="y"):
             if x in markDel:
                 continue
             if hasReached(position[users[x][3]], users[x][1].pos, building, doors, users[x][3]):
-                # print users[x][5]
+                # print users[x][3]
                 # If reached Destination
                 # users[x][1].velocity = vector(0,0,0)
 
@@ -435,6 +446,8 @@ def getData2(na, isdisplay=0, readFromFile="y"):
     # print "Done!!!"
     return time.time() - start_time
     # print ("--- %s seconds ---" % (time.time() - start_time))
+
+getData2(10, 1)
 
 # simTime = pickle.load(open("simtime1.dat", "rb"))
 # print simTime

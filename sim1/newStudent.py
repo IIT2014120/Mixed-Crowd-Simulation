@@ -34,7 +34,7 @@ def FSM():
     return user
 
 
-# hello = fsm()
+# hello = FSM()
 # isOver = False
 # while not isOver:
 #     (isOver, nextState) = hello.getNextState()
