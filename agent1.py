@@ -16,6 +16,11 @@ import sim1.staff as staff
 import sim2.externalStudent as externalStudent
 import sim2.internalStudent as internalStudent
 
+import sim3.passengerIn1 as passengerIn1
+import sim3.passengerIn2 as passengerIn2
+import sim3.passengerOut1 as passengerOut1
+import sim3.passengerOut2 as passengerOut2
+
 # Exam Cell - 0,0,25
 # Pillar1 - 0,50,5
 # Pillar2 - 0,50,5
@@ -72,8 +77,8 @@ def createGrid1():
     # scene.userzoom = True
     # scene.userpin = True
 
-def CreateGrid2():
-    rt1 = shapes.circle(radius=100, pos=(200,150))
+def createGrid2():
+    rt1 = shapes.circle(radius=30, pos=(200,150))
     rt2 = shapes.circle(radius=50, pos=(100,450))
     rt3 = shapes.circle(radius=125, pos=(400,300))
     rt4 = shapes.circle(radius=20, pos=(550,100))
@@ -86,6 +91,27 @@ def CreateGrid2():
     extrusion(shape=rt5, color=color.red)
 
     scene.center = (300, 300, 0)
+
+def createGrid3():
+    rt1 = shapes.circle(radius=20, pos=(300,150))
+    rt2 = shapes.circle(radius=20, pos=(300,250))
+    rt3 = shapes.circle(radius=20, pos=(300,350))
+
+    rt4 = shapes.circle(radius=30, pos=(250,430))
+    rt5 = shapes.circle(radius=30, pos=(350,430))
+    rt6 = shapes.circle(radius=30, pos=(250, 70))
+    rt7 = shapes.circle(radius=30, pos=(350, 70))
+
+    extrusion(shape=rt1,color=color.red)
+    extrusion(shape=rt2,color=color.red)
+    extrusion(shape=rt3,color=color.red)
+
+    extrusion(shape=rt4,color=color.cyan)
+    extrusion(shape=rt5,color=color.cyan)
+    extrusion(shape=rt6,color=color.cyan)
+    extrusion(shape=rt7,color=color.cyan)
+    
+    scene.center = (250,250,0)
 
 
 def inOffice(office, building, gridSize):
@@ -320,7 +346,7 @@ def getData2(na, isdisplay=0, readFromFile="y"):
     global rd
     rd = 4
     gridSize = 600
-    office = {'Admin': (200, 150, 100), 'CC3': (100, 450, 50), 'Ground': (400, 300, 125),
+    office = {'Admin': (200, 150, 30), 'CC3': (100, 450, 50), 'Ground': (400, 300, 125),
               'HQ': (550, 100, 20), 'Cafeteria': (500, 450, 25)}
 
     doors = {'Main-Gate': (150, 0, 0), 'Pocket-Gate': (400, 0, 0)}
@@ -369,7 +395,7 @@ def getData2(na, isdisplay=0, readFromFile="y"):
     users = []
     noOfAgent = [0, 0, 0, 0]
     if isdisplay == 1:
-        CreateGrid2()
+        createGrid2()
     start_time = time.time()
     for i in range(0, na):
         x = random.randint(0, 2)
@@ -447,7 +473,138 @@ def getData2(na, isdisplay=0, readFromFile="y"):
     return time.time() - start_time
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
-getData2(10, 1)
+def getData3(na, isdisplay=0, readFromFile="y"):
+    global rd
+    rd = 4
+    gridSize = 500
+    office = {'W1': (250, 430, 30), 'W2': (350, 430, 30), 'W3': (250, 70, 30), 'W4':(350, 70, 30), 'P1': (300, 150, 20), 'P2': (300, 250, 20), 'P3': (300, 350, 20)}
+
+    doors = {'Entry1': (200, 500, 0), 'Entry2': (200, 0, 0), 'Exit1': (400, 500, 0), 'Exit2': (400, 0, 0)}
+
+    building = {}
+    building.update(office)
+
+    position = {}
+    position.update(building)
+    position.update(doors)
+
+    allPaths = {}
+    isChanged = True
+    if os.path.isfile("building3.dat") and os.path.isfile("doors3.dat"):
+        if cmp(building, pickle.load(open("building3.dat", "rb"))) == 0 and cmp(doors, pickle.load(open("doors3.dat", "rb"))) == 0:
+            isChanged = False
+        else:
+            pickle.dump(building, open("building3.dat", "wb"))
+            pickle.dump(doors, open("doors3.dat", "wb"))
+    else:
+        pickle.dump(building, open("building3.dat", "wb"))
+        pickle.dump(doors, open("doors3.dat", "wb"))
+
+    # readFromFile = str(raw_input("Search and read from File (y/n) : "))
+
+    start_time = time.time()
+    if (readFromFile == "y"):
+        if os.path.isfile("allpaths3.dat") and not isChanged:
+            print "FILE STREAM"
+            allPaths = pickle.load(open("allpaths3.dat", "rb"))
+        else:
+            print "CALCULATIONS"
+            allPaths.update(inOffice(office, building, gridSize))
+            allPaths.update(toOffice(doors, office, building, gridSize))
+            pickle.dump(allPaths, open("allpaths3.dat", "wb"))
+
+    else:
+        allPaths.update(inOffice(office, building, gridSize))
+        allPaths.update(toOffice(doors, office, building, gridSize))
+        pickle.dump(allPaths, open("allpaths3.dat", "wb"))
+    print ("--- %s seconds ---" % (time.time() - start_time))
+
+    # na = int(input("No of Agents : "))
+    agentType = [passengerIn1, passengerIn2, passengerOut1, passengerOut2]
+    agentColor = [color.green, color.orange, color.blue, color.magenta]
+    users = []
+    noOfAgent = [0, 0, 0, 0]
+    if isdisplay == 1:
+        createGrid3()
+    start_time = time.time()
+    for i in range(0, na):
+        x = random.randint(0, 4)
+        # print x, agentType[x]
+        noOfAgent[x] = noOfAgent[x] + 1
+        users.append([])
+        users[i].append(agentType[x].FSM())
+        location = ''
+        if x <= 1:
+            location = 'Entry'+str(x+1)
+            users[i].append(sphere(pos=doors[location], radius=rd, color=agentColor[x], velocity=vector(0, 0, 0), visible=False))
+        else:
+            location = 'P'+str(random.randint(1,4))
+            users[i].append(sphere(pos=(office[location][0], office[location][1]+office[location][2]+2, 0), radius=rd, color=agentColor[x], velocity=vector(0, 0, 0), visible=False))
+        if isdisplay == 1:
+            users[i][1].visible = True
+        # users[i].append(sphere(pos=doors[location], radius=rd, color = agentColor[x], velocity=vector(0,0,0), visible = False))
+        users[i].append(location)  # Source 2
+        users[i].append(location)  # Destination 3
+        users[i].append([vector(0, 0, 0)])  # Direction 4
+        users[i].append([])
+        (isOver, nextDest) = (False, "None")
+        while not isOver:
+            (isOver, nextDest) = users[i][0].getNextState()
+            users[i][5].append(nextDest)
+            # print users[i][5]
+
+    # print noOfAgent
+
+    markDel = []
+    while len(users) - len(markDel) > 0:
+        # print len(markDel)
+        if isdisplay == 1:
+            rate(50)
+
+        for x in range(0, len(users)):
+            if x in markDel:
+                continue
+            if hasReached(position[users[x][3]], users[x][1].pos, building, doors, users[x][3]):
+                # print users[x][3]
+                # If reached Destination
+                # users[x][1].velocity = vector(0,0,0)
+
+                if len(users[x][5]) == 0:
+                    # Destination is Exit
+                    # print "Deleted", users[x]
+                    markDel.append(x)
+                    # print len(users)
+                    continue
+                else:
+                    # (isOver, nextDest) = (False, "None")
+                    # (isOver, nextDest) = users[x][0].getNextState()
+                    # print users[x][3]
+                    nextDest = users[x][5][0]
+                    # print nextDest
+                    del users[x][5][0]
+                    # if isOver:
+                    # users[x].append("delete")
+                    # print x , " is Over"
+                    users[x][2] = users[x][3]
+                    users[x][3] = nextDest
+            # print "users[x][3] = ", users[x][3], "Over"
+            socialForce = fagent(users[x], users) + fbuilding(users[x], building) + ftarget(users[x], users,
+                                                                                            position[users[x][3]][0],
+                                                                                            position[users[x][3]][1])
+            users[x][1].velocity = users[x][1].velocity + socialForce * dt
+            if (mag(users[x][1].velocity) > v0):
+                users[x][1].velocity = v0 * norm(users[x][1].velocity)
+            users[x][1].pos = users[x][1].pos + users[x][1].velocity * dt
+            # check(i, na)
+
+        for i in markDel:
+            del users[i]
+        markDel = []
+    # print "Done!!!"
+    return time.time() - start_time
+    # print ("--- %s seconds ---" % (time.time() - start_time))
+
+getData3(10, 1)
 
 # simTime = pickle.load(open("simtime1.dat", "rb"))
 # print simTime
