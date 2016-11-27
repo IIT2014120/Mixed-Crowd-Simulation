@@ -15,26 +15,8 @@ for i in x.values():
 
 plt.figure(1)
 
-plt.plot (y1)
-plt.ylabel('Simulation Time')
-plt.xlabel ('Number of Agents')
-
-
-plt.figure(2)
-plt.plot(y2)
+plt.plot(y2, y3, 'ro')
 plt.ylabel('Avg Distance per Agent')
-plt.xlabel('Number of Agents')
-
-
-plt.figure(3)
-plt.plot(y3)
-plt.ylabel('Avg Speed per Agent')
-plt.xlabel('Number of Agents')
-
-
-plt.figure(4)
-plt.plot(y4)
-plt.ylabel('Avg Time per Agent')
 plt.xlabel('Number of Agents')
 
 plt.show()

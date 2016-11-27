@@ -635,12 +635,12 @@ def getData3(na, isdisplay=0, readFromFile="y"):
 
 # print getData1(10, 
 
-curScene = 1
+curScene = 2
 possibleScenes = [0, getData1, getData2, getData3]
 
 simTime = {}
 # # 
-for i in range(0,80):
+for i in range(1,80):
     simTime[i] = possibleScenes[curScene](i)
     print i, simTime[i]
-    pickle.dump(simTime, open("simTime1.dat", "wb"))
+    pickle.dump(simTime, open("simTime2.dat", "wb"))
