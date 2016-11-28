@@ -585,6 +585,10 @@ def getData3(na, isdisplay=0, readFromFile="y"):
     # print noOfAgent
 
     markDel = []
+    avgdistance = 0
+    avgspeed = 0
+    avgtime = 0
+
     while len(users) - len(markDel) > 0:
         # print len(markDel)
         if isdisplay == 1:
@@ -617,30 +621,45 @@ def getData3(na, isdisplay=0, readFromFile="y"):
                     users[x][2] = users[x][3]
                     users[x][3] = nextDest
             # print "users[x][3] = ", users[x][3], "Over"
-            socialForce = fagent(users[x], users) + fbuilding(users[x], building) + ftarget(users[x], users,
-                                                                                            position[users[x][3]][0],
-                                                                                            position[users[x][3]][1])
-            users[x][1].velocity = users[x][1].velocity + socialForce * dt
-            if (mag(users[x][1].velocity) > v0):
-                users[x][1].velocity = v0 * norm(users[x][1].velocity)
-            users[x][1].pos = users[x][1].pos + users[x][1].velocity * dt
+            else:
+                socialForce = fagent(users[x], users) + fbuilding(users[x], building) + ftarget(users[x], users, position[users[x][3]][0], position[users[x][3]][1])
+                users[x][1].velocity = users[x][1].velocity + socialForce * dt
+                if (mag(users[x][1].velocity) > v0):
+                    users[x][1].velocity = v0 * norm(users[x][1].velocity)
+                users[x][1].pos = users[x][1].pos + users[x][1].velocity * dt
+                # Required Values for Conclusions
+                avgdistance = avgdistance + mag(users[x][1].velocity*dt)
+                # avgspeed = avgspeed + mag(users[x][1].velocity)
+                avgtime = avgtime + dt
             # check(i, na)
 
+        markDelCtr = 0
         for i in markDel:
-            del users[i]
+            try:
+                del users[i-markDelCtr]
+                markDelCtr = markDelCtr + 1
+            except :
+                print markDel
+                print users
+                print i, markDelCtr, len(users)
+                winsound.Beep(300,2000)
+                raise
         markDel = []
-    # print "Done!!!"
-    return time.time() - start_time
+    avgspeed = avgdistance/avgtime
+    avgdistance = avgdistance/na
+    avgtime = avgtime/na
+    return (time.time() - start_time, avgdistance, avgspeed, avgtime)
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
 # print getData1(10, 
 
-curScene = 2
+curScene = 3
 possibleScenes = [0, getData1, getData2, getData3]
 
-simTime = {}
+simTime = pickle.load(open("simTime2.dat", "rb"))
+print simTime
 # # 
-for i in range(1,80):
+for i in range(78,80):
     simTime[i] = possibleScenes[curScene](i)
     print i, simTime[i]
     pickle.dump(simTime, open("simTime2.dat", "wb"))
