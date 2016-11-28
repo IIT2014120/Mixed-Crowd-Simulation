@@ -656,10 +656,12 @@ def getData3(na, isdisplay=0, readFromFile="y"):
 curScene = 3
 possibleScenes = [0, getData1, getData2, getData3]
 
-simTime = pickle.load(open("simTime2.dat", "rb"))
-print simTime
-# # 
-for i in range(78,80):
-    simTime[i] = possibleScenes[curScene](i)
-    print i, simTime[i]
-    pickle.dump(simTime, open("simTime2.dat", "wb"))
+print getData3(20, 1)
+
+# simTime = pickle.load(open("simTime2.dat", "rb"))
+# print simTime
+# # # 
+# for i in range(1,80):
+#     simTime[i] = possibleScenes[curScene](i)
+#     print i, simTime[i]
+#     pickle.dump(simTime, open("simTime2.dat", "wb"))
