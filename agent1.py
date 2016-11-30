@@ -32,10 +32,16 @@ k = 120000
 K = 240000
 dt = 1.0/3
 
+
+def canvas(scene):  # return canvas bounding box, excluding frames
+    bar, d = 30, 8  # title bar and frame thickness for Windows
+    return (int(scene.x+d), int(scene.y+bar), int(scene.width-d), int(scene.height-d))
+
 def createGrid1():
     # rt = shapes.rectangle(width=200, height=200, thickness=0.03)
 
     scene.show_rendertime = True
+    # scene.fullscreen = True
     rt1 = shapes.circle(radius=25,pos=(100,100))
     rt2 = shapes.circle(radius=5,pos=(50,175))
     rt3 = shapes.circle(radius=5,pos=(50,25))
@@ -259,6 +265,7 @@ def getData1 (na, isdisplay=0, readFromFile="y"):
     noOfAgent = [0,0,0,0]
     if isdisplay == 1:
         createGrid1()
+    
     start_time = time.time()
     for i in range(0, na):
         x = random.randint(0,4)
@@ -287,7 +294,7 @@ def getData1 (na, isdisplay=0, readFromFile="y"):
     avgdistance = 0
     avgspeed = 0
     avgtime = 0
-
+    ic, fnum = 0, 0     # counter, and file number
     while len(users)-len(markDel) > 0 :
         # print len(markDel)
         if isdisplay == 1:
@@ -331,6 +338,14 @@ def getData1 (na, isdisplay=0, readFromFile="y"):
                 avgdistance = avgdistance + mag(users[x][1].velocity*dt)
                 # avgspeed = avgspeed + mag(users[x][1].velocity)
                 avgtime = avgtime + dt
+            # if (fnum >= 200): 
+            #     break
+            # if (ic%20 == 0):      # grab every 20 iterations, may need adjustment
+            #     im = ImageGrab.grab(canvas(scene))
+            #     num = '00'+repr(fnum)           # sequence num 000-00999, trunc. below
+            #     im.save('sim1/video/img-'+num[-3:]+'.png') # save to png file, 000-999, 3 digits
+            #     fnum += 1
+            # ic += 1
 
         markDelCtr = 0
         for i in markDel:
@@ -656,7 +671,7 @@ def getData3(na, isdisplay=0, readFromFile="y"):
 curScene = 3
 possibleScenes = [0, getData1, getData2, getData3]
 
-print getData3(20, 1)
+print getData3(10, 1)
 
 # simTime = pickle.load(open("simTime2.dat", "rb"))
 # print simTime
