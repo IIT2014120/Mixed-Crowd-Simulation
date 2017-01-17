@@ -37,6 +37,7 @@ def canvas(scene):  # return canvas bounding box, excluding frames
     bar, d = 30, 8  # title bar and frame thickness for Windows
     return (int(scene.x+d), int(scene.y+bar), int(scene.width-d), int(scene.height-d))
 
+# Scenario 1 rendering
 def createGrid1():
     # rt = shapes.rectangle(width=200, height=200, thickness=0.03)
 
@@ -72,6 +73,7 @@ def createGrid1():
     # scene.userzoom = True
     # scene.userpin = True
 
+# Scenario 2 rendering
 def createGrid2():
     rt1 = shapes.circle(radius=30, pos=(200,150))
     rt2 = shapes.circle(radius=50, pos=(100,450))
@@ -87,6 +89,7 @@ def createGrid2():
 
     scene.center = (300, 300, 0)
 
+# Scenario 3 rendering
 def createGrid3():
     rt1 = shapes.circle(radius=20, pos=(300,150))
     rt2 = shapes.circle(radius=20, pos=(300,250))
@@ -108,7 +111,7 @@ def createGrid3():
     
     scene.center = (250,250,0)
 
-
+# Finds distance between offices using PRM from project module
 def inOffice(office, building, gridSize):
     allPaths = {}
     for x in office.keys():
@@ -130,6 +133,7 @@ def inOffice(office, building, gridSize):
                 allPaths[(y, x)] = val
     return allPaths
 
+# Finds distance between office and buildings using PRM from project module
 def toOffice(doors, office, building, gridSize):
     allPaths = {}
     for x in office.keys():
@@ -150,7 +154,7 @@ def toOffice(doors, office, building, gridSize):
             allPaths[(y, x)] = val
     return allPaths
 
-
+# Checks if current goal has been reached
 def hasReached (curPos, dest, building, doors, location):
     if location in building:
         if mag(vector(curPos[0], curPos[1], 0) - vector(dest[0], dest[1], 0)) <= building[location][2] + rd + rd:
@@ -160,6 +164,7 @@ def hasReached (curPos, dest, building, doors, location):
              return True
     return False
 
+# calculates force due to other agents on an agent according to social force model 
 def fagent(curAgent, users):
     tf = vector(0,0,0)
     for i in users:
@@ -177,7 +182,7 @@ def fagent(curAgent, users):
             tf=tf+(A*m.exp((rij-dij)/B)+k*g)*nij+K*g*dvji*tij
     return tf
 
-
+# calculates force due to obstacles on an agent according to social force model 
 def fbuilding(curAgent, building):
     tf = vector(0,0,0)
     for i in building.values():
@@ -194,6 +199,7 @@ def fbuilding(curAgent, building):
         tf=tf+(A*m.exp((rij-dij)/0.01)-k*g)*nij+K*g*dvji*tij
     return tf
 
+# calculates force due to other agents on an agent according to social force model 
 def ftarget(curAgent, users, gx, gy):
     curAgent[4] = norm(vector(gx, gy, 0) - vector(curAgent[1].pos[0], curAgent[1].pos[1], 0))
     avg = vector(0, 0, 0)
@@ -209,6 +215,8 @@ def ftarget(curAgent, users, gx, gy):
     v = (v0 * curAgent[4] - curAgent[1].velocity)/t
     return v
 
+
+# Runs Scenario 1. na is number of agents, isdisplay is wether rendering is required and readFromFile is used to check if pre-computed data is used or not
 def getData1 (na, isdisplay=0, readFromFile="y"):
     global rd
     rd = 2
@@ -367,7 +375,7 @@ def getData1 (na, isdisplay=0, readFromFile="y"):
     return (time.time() - start_time, avgdistance, avgspeed, avgtime)
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
-
+# Runs Scenario 2. na is number of agents, isdisplay is wether rendering is required and readFromFile is used to check if pre-computed data is used or not
 def getData2(na, isdisplay=0, readFromFile="y"):
     global rd
     rd = 4
@@ -517,6 +525,7 @@ def getData2(na, isdisplay=0, readFromFile="y"):
     return (time.time() - start_time, avgdistance, avgspeed, avgtime)
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
+# Runs Scenario 3. na is number of agents, isdisplay is wether rendering is required and readFromFile is used to check if pre-computed data is used or not
 def getData3(na, isdisplay=0, readFromFile="y"):
     global rd
     rd = 4
@@ -666,12 +675,11 @@ def getData3(na, isdisplay=0, readFromFile="y"):
     return (time.time() - start_time, avgdistance, avgspeed, avgtime)
     # print ("--- %s seconds ---" % (time.time() - start_time))
 
-# print getData1(10, 
 
-curScene = 3
+curScene = 1
 possibleScenes = [0, getData1, getData2, getData3]
 
-print getData3(10, 1)
+print possibleScenes[curScene](30, 1)
 
 # simTime = pickle.load(open("simTime2.dat", "rb"))
 # print simTime

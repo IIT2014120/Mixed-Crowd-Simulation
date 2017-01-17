@@ -8,6 +8,7 @@ allpaths=[]
 curpos=[]
 curvel=[]
 direction=[]
+##----------constants used in social force model--------------##
 v0=1.5
 rd=0.35
 t=0.5
@@ -20,6 +21,7 @@ chk=[]
 def inc():
     return 10
 
+#calculates shortest distance from start node
 def dijkstra(nodes,e,wt,initial):
     visited = {initial: 0}
     path = {}
@@ -47,12 +49,12 @@ def dijkstra(nodes,e,wt,initial):
 def delta():
     return 0.5
 
-
+# calculates sqaure of euclidean distance
 def getDist(p1,p2):
     d=(p1[0]-p2[0])**2+(p1[1]-p2[1])**2
     return d
 
-
+# checks if point lies outside obstacles
 def feasibleCheckPoint(build,point):
     num=len(build)
     chk=False
@@ -66,7 +68,7 @@ def feasibleCheckPoint(build,point):
     else:
         return True
 
-        
+# randomly generates points inside the grid
 def generatePoints(n,numOfPoints,build):
     dic={}
     v=[]
@@ -78,7 +80,7 @@ def generatePoints(n,numOfPoints,build):
         v.append(point)    
     return v;
 
-
+# checks if edge crosses the obstacles or not
 def feasibleEdgeCheck(p1,p2,build):
     if m.sqrt(getDist(p1,p2))<delta():
         return True
@@ -87,7 +89,7 @@ def feasibleEdgeCheck(p1,p2,build):
         return False
     return feasibleEdgeCheck(p1,mid,build) and feasibleEdgeCheck(mid,p2,build)
 
-
+# generates valid edges between vetices which are less than D distance apart
 def generateEdges(v,build,D):
     num=len(v)
     e=dict()
@@ -105,7 +107,7 @@ def generateEdges(v,build,D):
 
     return e,wt
 
-
+# stores the shortest path to goal for each agent in allpaths
 def printPath(start,goal,path):
     global allpaths
     path1=[]
@@ -117,7 +119,7 @@ def printPath(start,goal,path):
     # allpaths.append(path1)
     return path1
     
-
+# calculates force due to target on an agent according to social force model 
 def ftarget(i,na,gx,gy) :
     global direction
     direction[i]=norm(vector(gx,gy,0)-vector(curpos[i][0],curpos[i][1],0))
@@ -136,6 +138,7 @@ def ftarget(i,na,gx,gy) :
     #print( v.x,v.y)
     return v
 
+# calculates force due to other agents on an agent according to social force model 
 def fagent(s,na) :
     global chk
     tf=vector(0,0,0)
@@ -154,6 +157,8 @@ def fagent(s,na) :
     #print(tf.x,tf.y)
     return tf
 
+
+# calculates force due to obstacles on an agent according to social force model 
 def fbuilding(s,build) :
     global chk
     tf=vector(0,0,0)
@@ -171,13 +176,14 @@ def fbuilding(s,build) :
         tf=tf+(A*m.exp((rij-dij)/0.01)-k*g)*nij+K*g*dvji*tij
     return tf
 
+# debug fucntion for colusion detection!
 def check(s,na) :
     global chk
     for i in range(0,na) :
         d=m.sqrt((curpos[i][0]-curpos[s][0])**2 + (curpos[i][1]-curpos[s][1])**2)
 
 
-
+# simulates collision free basic motion along a path for an agent
 def simulatepaths(build,na,goal) :
     agent=[]
     l=len(build)
@@ -223,6 +229,7 @@ def simulatepaths(build,na,goal) :
                     curvel[i]=vector(0,0,0)
                     chk[i]=True
  
+# generates a probabilistic roadmap 
 def prm(start,goal,n,build,D):
     global a
     global b
@@ -239,7 +246,7 @@ def prm(start,goal,n,build,D):
     else:
         return printPath(start,goal,path)
         
-    
+# used for getting inputs from user
 def getData():
     global a
     global b
